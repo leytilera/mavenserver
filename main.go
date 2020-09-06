@@ -8,7 +8,13 @@ import (
 
 func main() {
 	var auth maven.AuthManager
-	config := readconf("config.yaml")
+	var conf string
+	if len(os.Args) > 1 {
+		conf = os.Args[1]
+	} else {
+		conf = "config.yaml"
+	}
+	config := readconf(conf)
 	auth = maven.Create(config.Database)
 	maven.StartServer(config.Server, &auth)
 }
