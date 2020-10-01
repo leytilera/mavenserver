@@ -20,7 +20,9 @@ type AuthManager interface {
 
 func StartServer(conf ServerConf, auth *AuthManager) {
 	handler := mux.NewRouter()
-	handler.PathPrefix(conf.BasePath).Methods("GET").Handler(http.StripPrefix(conf.BasePath, http.FileServer(http.Dir(conf.MavenPath))))
+	fileserver := http.FileServer(http.Dir(conf.MavenPath))
+	handler.PathPrefix(conf.BasePath).Methods("GET").Handler(http.StripPrefix(conf.BasePath, fileserver))
+	handler.PathPrefix(conf.BasePath).Methods("HEAD").Handler(http.StripPrefix(conf.BasePath, fileserver))
 	handler.PathPrefix(conf.BasePath).Methods("PUT").Handler(http.StripPrefix(conf.BasePath, PutHandler{rootpath: conf.MavenPath, auth: auth}))
 	err := http.ListenAndServe("0.0.0.0:"+strconv.Itoa(conf.Port), handler)
 	if err != nil {
